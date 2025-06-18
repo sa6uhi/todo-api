@@ -56,3 +56,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 def read_tasks(db: Session = Depends(get_db)):
     tasks = crud.get_tasks(db)
     return tasks
+
+
+@app.get("/tasks/user/", response_model=List[schemas.Task])
+def read_user_tasks(current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    tasks = crud.get_user_tasks(db, user_id=current_user.id)
+    return tasks
