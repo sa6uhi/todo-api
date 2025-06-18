@@ -59,3 +59,13 @@ async def test_user(session):
     session.commit()
     session.refresh(db_user)
     return user_data
+
+
+@pytest_asyncio.fixture
+async def token(client, test_user):
+    response = client.post(
+        "/token",
+        data={"username": test_user["username"], "password": "password123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    return response.json()["access_token"]
