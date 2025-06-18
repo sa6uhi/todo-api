@@ -103,3 +103,22 @@ def test_delete_task(client, token):
     assert response.status_code == status.HTTP_200_OK
     get_response = client.get(f"/tasks/{task_id}")
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_read_tasks_with_pagination_and_status(client, token):
+    client.post(
+        "/tasks/",
+        json={"title": "Task 1", "status": "NEW"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    client.post(
+        "/tasks/",
+        json={"title": "Task 2", "status": "IN_PROGRESS"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    response = client.get("/tasks/?skip=0&limit=1&status=NEW")
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert len(data["items"]) == 1
+    assert data["items"][0]["status"] == "NEW"
+    assert data["total"] >= 1
