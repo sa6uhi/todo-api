@@ -28,3 +28,24 @@ def test_create_user_duplicate_username(client, test_user):
     response = client.post("/users/", json=user_data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "Username already registered!"
+
+
+def test_login_success(client, test_user):
+    response = client.post(
+        "/token",
+        data={"username": test_user["username"], "password": "sabuhi123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+def test_login_invalid_credentials(client, test_user):
+    response = client.post(
+        "/token",
+        data={"username": test_user["username"], "password": "wrongpassword"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()["detail"] == "Incorrect username or password!"
