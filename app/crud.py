@@ -35,8 +35,29 @@ def get_user_tasks(db: Session, user_id: int):
 
 
 def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
-    db_task = models.Task(**task.dict(), user_id=user_id)
+    # db_task = models.Task(**task.dict(), user_id=user_id) # TODO
+    db_task = models.Task(**task.model_dump(), user_id=user_id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
+    return db_task
+
+
+def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if db_task:
+        # update_data = task.dict(exclude_unset=True) # TODO
+        update_data = task.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_task, key, value)
+        db.commit()
+        db.refresh(db_task)
+    return db_task
+
+
+def delete_task(db: Session, task_id: int):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if db_task:
+        db.delete(db_task)
+        db.commit()
     return db_task
