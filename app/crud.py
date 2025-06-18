@@ -8,12 +8,12 @@ def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 def create_user(db: Session, user: schemas.UserCreate):
-    password = pwd_context.hash(user.password)
+    hashed_password = pwd_context.hash(user.password)
     db_user = models.User(
         first_name=user.first_name,
         last_name=user.last_name,
         username=user.username,
-        password=password
+        password=hashed_password
     )
     db.add(db_user)
     db.commit()
