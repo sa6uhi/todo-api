@@ -52,20 +52,27 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     # return schemas.Token(access_token=access_token, token_type="bearer") # TODO
 
 
-@app.get("/tasks/", response_model=List[schemas.Task])
-def read_tasks(status: Optional[str] = None, db: Session = Depends(get_db)):
-    tasks = crud.get_tasks(db, status=status)
-    return tasks
+@app.get("/tasks/", response_model=schemas.PaginatedTasks)
+def read_tasks(
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db),
+):
+    tasks = crud.get_tasks(db, status=status, skip=skip, limit=limit)
+    return {"items": tasks["items"], "total": tasks["total"], "skip": skip, "limit": limit}
 
 
-@app.get("/tasks/user/", response_model=List[schemas.Task])
+@app.get("/tasks/user/", response_model=schemas.PaginatedTasks)
 def read_user_tasks(
     status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 10,
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
-    tasks = crud.get_user_tasks(db, user_id=current_user.id, status=status)
-    return tasks
+    tasks = crud.get_user_tasks(db, user_id=current_user.id, status=status, skip=skip, limit=limit)
+    return {"items": tasks["items"], "total": tasks["total"], "skip": skip, "limit": limit}
 
 
 @app.get("/tasks/{task_id}", response_model=schemas.Task)
