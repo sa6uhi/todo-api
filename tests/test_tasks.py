@@ -49,3 +49,23 @@ def test_read_task(client, token):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["title"] == "Task to Read"
+
+
+def test_update_task(client, token):
+    task_data = {"title": "Task to Update", "description": "Update Test"}
+    create_response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    task_id = create_response.json()["id"]
+    update_data = {"title": "Updated Task", "status": "IN_PROGRESS"}
+    response = client.put(
+        f"/tasks/{task_id}",
+        json=update_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["title"] == "Updated Task"
+    assert data["status"] == "IN_PROGRESS"
