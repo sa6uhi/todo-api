@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
+from typing import List
 from . import models, schemas, crud, auth
 from .database import SessionLocal, engine
 
@@ -45,6 +46,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires)
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
     return {"access_token": access_token, "token_type": "bearer"}
     # return schemas.Token(access_token=access_token, token_type="bearer") TODO
+
+
+@app.get("/tasks/", response_model=List[schemas.Task])
+def read_tasks(db: Session = Depends(get_db)):
+    tasks = crud.get_tasks(db)
+    return tasks
