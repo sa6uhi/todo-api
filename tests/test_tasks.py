@@ -86,3 +86,20 @@ def test_complete_task(client, token):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["status"] == "COMPLETED"
+
+
+def test_delete_task(client, token):
+    task_data = {"title": "Task to Delete", "description": "Delete Test"}
+    create_response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    task_id = create_response.json()["id"]
+    response = client.delete(
+        f"/tasks/{task_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    get_response = client.get(f"/tasks/{task_id}")
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND
