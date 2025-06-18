@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
-from typing import List
+from typing import List, Optional
 from . import models, schemas, crud, auth
 from .database import SessionLocal, engine
 
@@ -41,7 +41,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username or password!",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -49,18 +49,22 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-    # return schemas.Token(access_token=access_token, token_type="bearer") TODO
+    # return schemas.Token(access_token=access_token, token_type="bearer") # TODO
 
 
 @app.get("/tasks/", response_model=List[schemas.Task])
-def read_tasks(db: Session = Depends(get_db)):
-    tasks = crud.get_tasks(db)
+def read_tasks(status: Optional[str] = None, db: Session = Depends(get_db)):
+    tasks = crud.get_tasks(db, status=status)
     return tasks
 
 
 @app.get("/tasks/user/", response_model=List[schemas.Task])
-def read_user_tasks(current_user: schemas.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
-    tasks = crud.get_user_tasks(db, user_id=current_user.id)
+def read_user_tasks(
+    status: Optional[str] = None,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    tasks = crud.get_user_tasks(db, user_id=current_user.id, status=status)
     return tasks
 
 
