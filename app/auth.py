@@ -1,8 +1,10 @@
 from passlib.context import CryptContext
 from . import models
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def verify_password(plain_password, hashed_password):
