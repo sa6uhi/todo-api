@@ -1,5 +1,12 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from enum import Enum
+
+
+class TaskStatus(str, Enum):
+    NEW = "New"
+    IN_PROGRESS = "In Progress"
+    COMPLETED = "Completed"
 
 
 class UserBase(BaseModel):
@@ -22,3 +29,25 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class TaskBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    status: TaskStatus = TaskStatus.NEW
+
+
+class TaskCreate(TaskBase):
+    pass
+
+
+class TaskUpdate(TaskBase):
+    pass
+
+
+class Task(TaskBase):
+    id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
