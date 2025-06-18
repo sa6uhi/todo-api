@@ -70,3 +70,12 @@ def read_task(task_id: int, db: Session = Depends(get_db)):
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
+
+
+@app.post("/tasks/", response_model=schemas.Task)
+def create_task(
+    task: schemas.TaskCreate,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    return crud.create_task(db=db, task=task, user_id=current_user.id)
