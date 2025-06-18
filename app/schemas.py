@@ -51,3 +51,10 @@ class Task(TaskBase):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedTasks(BaseModel):
+    items: list[Task]
+    total: int
+    skip: int
+    limit: int
