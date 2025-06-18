@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from typing import Optional
 from . import models, schemas
 from passlib.context import CryptContext
 
@@ -27,12 +28,18 @@ def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
 
-def get_tasks(db: Session):
-    return db.query(models.Task).all()
+def get_tasks(db: Session, status: Optional[str] = None):
+    query = db.query(models.Task)
+    if status:
+        query = query.filter(models.Task.status == status)
+    return query.all()
 
 
-def get_user_tasks(db: Session, user_id: int):
-    return db.query(models.Task).filter(models.Task.user_id == user_id).all()
+def get_user_tasks(db: Session, user_id: int, status: Optional[str] = None):
+    query = db.query(models.Task).filter(models.Task.user_id == user_id)
+    if status:
+        query = query.filter(models.Task.status == status)
+    return query.all()
 
 
 def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
