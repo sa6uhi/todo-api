@@ -5,9 +5,9 @@ import enum
 
 
 class TaskStatus(enum.Enum):
-    NEW = "New"
-    IN_PROGRESS = "In Progress"
-    COMPLETED = "Completed"
+    NEW = "NEW"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
 
 
 class User(Base):
@@ -29,7 +29,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    status = Column(Enum(TaskStatus, native_enum=False), default=TaskStatus.NEW, nullable=False)
+    status = Column(Enum(TaskStatus), default=TaskStatus.NEW, nullable=False)
     user_id = Column(Integer, ForeignKey(
         "users.id", ondelete="CASCADE"), nullable=False)
 
