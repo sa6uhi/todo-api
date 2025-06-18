@@ -79,3 +79,18 @@ def create_task(
     db: Session = Depends(get_db),
 ):
     return crud.create_task(db=db, task=task, user_id=current_user.id)
+
+
+@app.put("/tasks/{task_id}", response_model=schemas.Task)
+def update_task(
+    task_id: int,
+    task: schemas.TaskUpdate,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    db_task = crud.get_task(db, task_id=task_id)
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found!")
+    if db_task.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this task!")
+    return crud.update_task(db=db, task_id=task_id, task=task)
