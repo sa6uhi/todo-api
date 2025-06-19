@@ -5,20 +5,9 @@ from datetime import timedelta
 from typing import List, Optional
 from . import models, schemas, crud, auth
 from .database import SessionLocal, engine
-
-models.Base.metadata.create_all(bind=engine)
+from .deps import get_db
 
 app = FastAPI()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @app.get("/")
@@ -36,7 +25,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/token", response_model=schemas.Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -48,48 +37,47 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = auth.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
-    # return schemas.Token(access_token=access_token, token_type="bearer") # TODO
+    return schemas.Token(access_token=access_token, token_type="bearer")
+
+
+@app.post("/tasks/", response_model=schemas.Task)
+def create_task(
+    task: schemas.TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(auth.get_current_user),
+):
+    return crud.create_task(db=db, task=task, user_id=current_user.id)
 
 
 @app.get("/tasks/", response_model=schemas.PaginatedTasks)
 def read_tasks(
-    status: Optional[str] = None,
     skip: int = 0,
     limit: int = 10,
+    status: Optional[schemas.TaskStatus] = None,
     db: Session = Depends(get_db),
 ):
-    tasks = crud.get_tasks(db, status=status, skip=skip, limit=limit)
-    return {"items": tasks["items"], "total": tasks["total"], "skip": skip, "limit": limit}
+    tasks, total = crud.get_tasks(db, skip=skip, limit=limit, status=status)
+    return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
 
 @app.get("/tasks/user/", response_model=schemas.PaginatedTasks)
 def read_user_tasks(
-    status: Optional[str] = None,
     skip: int = 0,
     limit: int = 10,
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
-    tasks = crud.get_user_tasks(db, user_id=current_user.id, status=status, skip=skip, limit=limit)
-    return {"items": tasks["items"], "total": tasks["total"], "skip": skip, "limit": limit}
+    tasks, total = crud.get_user_tasks(
+        db, user_id=current_user.id, skip=skip, limit=limit)
+    return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
 
 @app.get("/tasks/{task_id}", response_model=schemas.Task)
 def read_task(task_id: int, db: Session = Depends(get_db)):
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task not found!")
     return db_task
-
-
-@app.post("/tasks/", response_model=schemas.Task)
-def create_task(
-    task: schemas.TaskCreate,
-    current_user: schemas.User = Depends(auth.get_current_user),
-    db: Session = Depends(get_db),
-):
-    return crud.create_task(db=db, task=task, user_id=current_user.id)
 
 
 @app.put("/tasks/{task_id}", response_model=schemas.Task)
@@ -108,21 +96,6 @@ def update_task(
     return crud.update_task(db=db, task_id=task_id, task=task)
 
 
-@app.delete("/tasks/{task_id}", response_model=schemas.Task)
-def delete_task(
-    task_id: int,
-    current_user: schemas.User = Depends(auth.get_current_user),
-    db: Session = Depends(get_db),
-):
-    db_task = crud.get_task(db, task_id=task_id)
-    if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    if db_task.user_id != current_user.id:
-        raise HTTPException(
-            status_code=403, detail="Not authorized to delete this task")
-    return crud.delete_task(db=db, task_id=task_id)
-
-
 @app.patch("/tasks/{task_id}/complete", response_model=schemas.Task)
 def complete_task(
     task_id: int,
@@ -135,4 +108,19 @@ def complete_task(
     if db_task.user_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to update this task!")
-    return crud.update_task_status(db=db, task_id=task_id, status="COMPLETED")
+    return crud.update_task_status(db=db, task_id=task_id, status="COMPLETED") # TODO implemet complete_task or edit update_task_status function in crud.py 
+
+
+@app.delete("/tasks/{task_id}", response_model=None)
+def delete_task(
+    task_id: int,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    db_task = crud.get_task(db, task_id=task_id)
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found!")
+    if db_task.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to delete this task!")
+    return {"detail": "Task deleted"}
