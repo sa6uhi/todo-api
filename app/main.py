@@ -108,7 +108,7 @@ def complete_task(
     if db_task.user_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to update this task!")
-    return crud.update_task_status(db=db, task_id=task_id, status="COMPLETED") # TODO implemet complete_task or edit update_task_status function in crud.py 
+    return crud.complete_task(db=db, task_id=task_id, status="COMPLETED")
 
 
 @app.delete("/tasks/{task_id}", response_model=None)
@@ -123,4 +123,5 @@ def delete_task(
     if db_task.user_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to delete this task!")
+    crud.delete_task(db=db, task_id=task_id)
     return {"detail": "Task deleted"}
