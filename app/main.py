@@ -60,10 +60,10 @@ def read_tasks(
             status_code=400,
             detail="Skip must be non-negative!"
         )
-    if limit <= 0 or limit > 100:  # example limit range
+    if limit <= 0:
         raise HTTPException(
             status_code=400,
-            detail="Limit must be between 1 and 100!"
+            detail="Limit must be greater than zero!"
         )
     tasks, total = crud.get_tasks(db, skip=skip, limit=limit, status=status)
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
@@ -81,10 +81,10 @@ def read_user_tasks(
             status_code=400,
             detail="Skip must be non-negative!"
         )
-    if limit <= 0 or limit > 100:
+    if limit <= 0:
         raise HTTPException(
             status_code=400,
-            detail="Limit must be between 1 and 100!"
+            detail="Limit must be greater than zero!"
         )
     tasks, total = crud.get_user_tasks(
         db, user_id=current_user.id, skip=skip, limit=limit)
