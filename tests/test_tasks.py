@@ -22,6 +22,8 @@ def test_create_task(client, token):
 
 def test_read_tasks(client):
     response = client.get("/tasks/")
+    if response.status_code != status.HTTP_200_OK:
+        print(f"Read tasks failed: {response.json()}")  # debugging
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert "items" in data
