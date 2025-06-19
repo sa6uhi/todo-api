@@ -1,12 +1,13 @@
-from passlib.context import CryptContext
-from . import models
-from sqlalchemy.orm import Session
+from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from .database import SessionLocal
-from fastapi import HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+from app import crud, schemas
+from app.main import get_db
+from app.database import SessionLocal
 
 SECRET_KEY = "my-secret-key"  # i will replace it with env variable later
 ALGORITHM = "HS256"
@@ -21,9 +22,10 @@ def verify_password(plain_password, hashed_password):
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = db.query(models.User).filter(
-        models.User.username == username).first()
-    if not user or not verify_password(password, user.password):
+    user = crud.get_user_by_username(db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -39,7 +41,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(lambda: SessionLocal())):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Couldn't validate credentials",
@@ -52,8 +54,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = db.query(models.User).filter(
-        models.User.username == username).first()
+    user = crud.get_user_by_username(db, username=username)
     if user is None:
         raise credentials_exception
-    return user
+    return schemas.User.model_validate(user)
