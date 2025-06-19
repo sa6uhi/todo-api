@@ -4,7 +4,7 @@ from fastapi import status
 
 def test_create_task(client, token):
     task_data = {"title": "Test Task",
-                 "description": "Test Description", "status": "NEW"}
+                 "description": "Test Description"}
     response = client.post(
         "/tasks/",
         json=task_data,
@@ -16,6 +16,17 @@ def test_create_task(client, token):
     assert data["status"] == "NEW"
     assert "id" in data
     assert "user_id" in data
+
+
+def test_create_task_invalid_title(client, token):
+    task_data = {"title": "", "description": "Invalid"}
+    response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "title" in response.json()["detail"][0]["loc"]
 
 
 def test_read_tasks(client):
@@ -128,3 +139,15 @@ def test_read_tasks_with_pagination_and_status(client, token):
     assert len(data["items"]) == 1
     assert data["items"][0]["status"] == "NEW"
     assert data["total"] >= 1
+
+
+def test_read_tasks_invalid_skip(client):
+    response = client.get("/tasks/?skip=-1")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()["detail"] == "Skip must be non-negative!"
+
+
+def test_read_tasks_invalid_limit(client):
+    response = client.get("/tasks/?limit=0")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()["detail"] == "Limit must be greater than zero!"
