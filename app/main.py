@@ -36,7 +36,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = auth.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return schemas.Token(access_token=access_token, token_type="bearer")
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @app.post("/tasks/", response_model=schemas.Task)
@@ -55,6 +55,16 @@ def read_tasks(
     status: Optional[schemas.TaskStatus] = None,
     db: Session = Depends(get_db),
 ):
+    if skip < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Skip must be non-negative!"
+        )
+    if limit <= 0 or limit > 100:  # example limit range
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be between 1 and 100!"
+        )
     tasks, total = crud.get_tasks(db, skip=skip, limit=limit, status=status)
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
@@ -66,6 +76,16 @@ def read_user_tasks(
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
+    if skip < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Skip must be non-negative!"
+        )
+    if limit <= 0 or limit > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be between 1 and 100!"
+        )
     tasks, total = crud.get_user_tasks(
         db, user_id=current_user.id, skip=skip, limit=limit)
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
