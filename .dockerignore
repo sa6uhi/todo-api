@@ -5,7 +5,7 @@ __pycache__/
 venv/
 .env
 *.log
-tests/
+# tests/
 .pytest_cache/
 postgres_data/
 .vscode/
