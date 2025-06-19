@@ -147,6 +147,8 @@ def test_read_tasks_with_pagination_and_status(client, token):
         print(f"Create task 2 failed: {create_response2.json()}")  # debugging
     assert create_response2.status_code == status.HTTP_200_OK
     response = client.get("/tasks/?skip=0&limit=1&status=NEW")
+    if response.status_code != status.HTTP_200_OK:
+        print(f"Read tasks with pagination failed: {response.json()}")  # debugging
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data["items"]) == 1
