@@ -8,8 +8,17 @@ from passlib.context import CryptContext
 from app import crud, schemas
 from app.main import get_db
 from app.database import SessionLocal
+from dotenv import load_dotenv
+import os
 
-SECRET_KEY = "my-secret-key"  # i will replace it with env variable later
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable not set.")
+
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
