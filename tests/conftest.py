@@ -4,7 +4,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from app.main import app, get_db
+from app.main import app
+from app.deps import get_db
 from app import models, schemas
 from passlib.context import CryptContext
 
@@ -68,9 +69,6 @@ async def token(client, test_user):
         data={"username": test_user["username"], "password": "sabuhi123"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-    if response.status_code != 200:
-        print(f"Token creation failed: {response.json()}")  # debugging
     assert response.status_code == 200
     token = response.json()["access_token"]
-    print(f"Generated token: {token}")  # debugging
     return token
