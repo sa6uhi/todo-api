@@ -133,6 +133,7 @@ def test_read_tasks_with_pagination_and_status(client, token):
     )
     if create_response1.status_code != status.HTTP_200_OK:
         print(f"Create task 1 failed: {create_response1.json()}")  # debugging
+    assert create_response1.status_code == status.HTTP_200_OK
     create_response2 = client.post(
         "/tasks/",
         json={"title": "Task 2", "status": "IN_PROGRESS"},
@@ -140,6 +141,7 @@ def test_read_tasks_with_pagination_and_status(client, token):
     )
     if create_response2.status_code != status.HTTP_200_OK:
         print(f"Create task 2 failed: {create_response2.json()}")  # debugging
+    assert create_response2.status_code == status.HTTP_200_OK
     response = client.get("/tasks/?skip=0&limit=1&status=NEW")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
