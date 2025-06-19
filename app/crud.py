@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List, Tuple
 from . import models, schemas
 from passlib.context import CryptContext
 
@@ -28,22 +28,20 @@ def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
 
-def get_tasks(db: Session, status: Optional[str] = None, skip: int = 0, limit: int = 10):
+def get_tasks(db: Session, skip: int = 0, limit: int = 10, status: Optional[schemas.TaskStatus] = None) -> Tuple[List[models.Task], int]:
     query = db.query(models.Task)
     if status:
         query = query.filter(models.Task.status == status)
     total = query.count()
     tasks = query.offset(skip).limit(limit).all()
-    return {"items": tasks, "total": total}
+    return tasks, total
 
 
-def get_user_tasks(db: Session, user_id: int, status: Optional[str] = None, skip: int = 0, limit: int = 10):
+def get_user_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 10) -> Tuple[List[models.Task], int]:
     query = db.query(models.Task).filter(models.Task.user_id == user_id)
-    if status:
-        query = query.filter(models.Task.status == status)
     total = query.count()
     tasks = query.offset(skip).limit(limit).all()
-    return {"items": tasks, "total": total}
+    return tasks, total
 
 
 def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
@@ -67,10 +65,19 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
     return db_task
 
 
-def update_task_status(db: Session, task_id: int, status: str):
+def update_task_status(db: Session, task_id: int, status: str): # TODO edit endpoint and remove this
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if db_task:
         db_task.status = status
+        db.commit()
+        db.refresh(db_task)
+    return db_task
+
+
+def complete_task(db: Session, task_id: int):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if db_task:
+        db_task.status = schemas.TaskStatus.COMPLETED
         db.commit()
         db.refresh(db_task)
     return db_task
