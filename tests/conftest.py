@@ -4,8 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from app.main import app
-from app.database import Base
+from app.main import app, get_db
 from app import models
 from passlib.context import CryptContext
 
@@ -22,13 +21,13 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture
 def session():
-    Base.metadata.create_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-    Base.metadata.drop_all(bind=engine)
+    models.Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
@@ -39,9 +38,9 @@ def client(session):
         finally:
             session.close()
 
-    app.dependency_overrides[app.get_db] = override_get_db
+    app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
-    del app.dependency_overrides[app.get_db]
+    del app.dependency_overrides[get_db]
 
 
 @pytest_asyncio.fixture
