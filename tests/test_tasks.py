@@ -124,6 +124,8 @@ def test_delete_task(client, token):
     )
     assert response.status_code == status.HTTP_200_OK
     get_response = client.get(f"/tasks/{task_id}")
+    if get_response.status_code != status.HTTP_404_NOT_FOUND:
+        print(f"Get deleted task failed: {get_response.json()}")  # debugging
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
 
 
