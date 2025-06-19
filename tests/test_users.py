@@ -18,6 +18,30 @@ def test_create_user(client):
     assert "password" not in data
 
 
+def test_create_user_empty_username(client):
+    user_data = {
+        "first_name": "Sabuhi",
+        "last_name": "Nazarov",
+        "username": "",
+        "password": "sabuhi123"
+    }
+    response = client.post("/users/", json=user_data)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "username" in response.json()["detail"][0]["loc"]
+
+
+def test_create_user_short_password(client):
+    user_data = {
+        "first_name": "Sabuhi",
+        "last_name": "Nazarov",
+        "username": "sabuhinazarov",
+        "password": "short"
+    }
+    response = client.post("/users/", json=user_data)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "password" in response.json()["detail"][0]["loc"]
+
+
 def test_create_user_duplicate_username(client, test_user):
     user_data = {
         "first_name": "Sabuhi",
