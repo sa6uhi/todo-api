@@ -1,10 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
-from typing import List, Optional
-from . import models, schemas, crud, auth
-from .database import SessionLocal, engine
+from typing import Optional
+from . import schemas, crud, auth
 from .deps import get_db
 
 app = FastAPI()
@@ -108,7 +107,7 @@ def complete_task(
     if db_task.user_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="Not authorized to update this task!")
-    return crud.complete_task(db=db, task_id=task_id, status="COMPLETED")
+    return crud.complete_task(db=db, task_id=task_id)
 
 
 @app.delete("/tasks/{task_id}", response_model=None)
@@ -124,4 +123,4 @@ def delete_task(
         raise HTTPException(
             status_code=403, detail="Not authorized to delete this task!")
     crud.delete_task(db=db, task_id=task_id)
-    return {"detail": "Task deleted"}
+    return None
