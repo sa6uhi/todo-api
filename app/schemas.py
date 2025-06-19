@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List
 from enum import Enum
 
 
@@ -22,8 +22,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -49,12 +48,11 @@ class Task(TaskBase):
     id: int
     user_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaginatedTasks(BaseModel):
-    items: list[Task]
+    items: List[Task]
     total: int
     skip: int
     limit: int
