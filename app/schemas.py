@@ -10,9 +10,9 @@ class TaskStatus(str, Enum):
 
 
 class UserBase(BaseModel):
-    first_name: str
+    first_name: str = Field(..., min_length=1)
     last_name: Optional[str] = None
-    username: str
+    username: str = Field(..., min_length=1)
 
 
 class UserCreate(UserBase):
@@ -31,8 +31,8 @@ class Token(BaseModel):
 
 
 class TaskBase(BaseModel):
-    title: str
-    description: Optional[str] = None
+    title: str = Field(..., min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
     status: TaskStatus = TaskStatus.NEW
 
 
