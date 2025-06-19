@@ -6,8 +6,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from app import crud, schemas
-from app.main import get_db
-from app.database import SessionLocal
+from app.deps import get_db
 from dotenv import load_dotenv
 import os
 
@@ -26,19 +25,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def authenticate_user(db: Session, username: str, password: str):
-    user = crud.get_user_by_username(db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -50,10 +36,23 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
+def authenticate_user(db: Session, username: str, password: str):
+    user = crud.get_user_by_username(db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.password):
+        return False
+    return user
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Couldn't validate credentials",
+        detail="Couldn't validate credentials!",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
