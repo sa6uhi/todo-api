@@ -46,7 +46,7 @@ def client(session):
 @pytest_asyncio.fixture
 async def test_user(session):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    hashed_password = pwd_context.hash("password123")
+    hashed_password = pwd_context.hash("sabuhi123")
     user_data = {
         "first_name": "Test",
         "last_name": "User",
@@ -64,7 +64,7 @@ async def test_user(session):
 async def token(client, test_user):
     response = client.post(
         "/token",
-        data={"username": test_user["username"], "password": "password123"},
+        data={"username": test_user["username"], "password": "sabuhi123"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     return response.json()["access_token"]
