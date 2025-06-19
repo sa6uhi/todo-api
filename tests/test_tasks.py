@@ -29,6 +29,28 @@ def test_create_task_invalid_title(client, token):
     assert "title" in response.json()["detail"][0]["loc"]
 
 
+def test_create_task_without_token(client):
+    task_data = {"title": "Test Task Without Token",
+                 "description": "Test Description"}
+    response = client.post("/tasks/", json=task_data)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    data = response.json()
+    assert data["detail"] == "Not authenticated"
+
+
+def test_create_task_with_invalid_token(client):
+    task_data = {"title": "Test Task With Invalid Token",
+                 "description": "Test Description"}
+    response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": "Bearer invalid_token"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    data = response.json()
+    assert data["detail"] == "Couldn't validate credentials!"
+
+
 def test_read_tasks(client):
     response = client.get("/tasks/")
     assert response.status_code == status.HTTP_200_OK
