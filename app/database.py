@@ -5,11 +5,11 @@ import os
 
 load_dotenv()
 
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "todo_db")
+POSTGRES_USER = os.getenv("POSTGRES_USER") # todo_user
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") # todo_password
+POSTGRES_HOST = os.getenv("POSTGRES_HOST") # localhost for local, db for docker
+POSTGRES_PORT = os.getenv("POSTGRES_PORT") # 5432
+POSTGRES_DB = os.getenv("POSTGRES_DB") # todo_db
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@"
