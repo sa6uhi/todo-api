@@ -302,7 +302,9 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: `{ "items": [{ "id": <int>, "title": "<string>", "description": "<string|null>", "status": "<string>", "user_id": <int> }], "total": <int>, "skip": <int>, "limit": <int> }`
   - **Errors**:
     - 401 Unauthorized: If no valid token is provided.
-    - 400 Bad Request: If `skip` < 0 or `limit` ≤ 0.
+    - 400 Bad Request: `{ "detail": "Skip must be non-negative!" }` if `skip` < 0.
+    - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` ≥ 100.
+    - 400 Bad Request: `{ "detail": "Skip value {skip} exceeds total user tasks {total}" }` if `skip` is greater than or equal to the total number of user tasks.
   - **Notes**: Only returns tasks owned by the authenticated user.
 
 - **GET /tasks/{task_id}**
