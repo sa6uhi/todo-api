@@ -184,16 +184,6 @@ To run unit tests locally, ensure the virtual environment is activated and depen
    ```
    This executes all tests in the `tests/` directory using an in-memory SQLite database for isolation. The `-v` flag provides verbose output for better test result visibility.
 
-2. **View Test Coverage** (optional):
-   Install `pytest-cov`:
-   ```bash
-   pip install pytest-cov
-   ```
-   Run tests with coverage:
-   ```bash
-   pytest tests/ -v --cov=app
-   ```
-
 ### Docker Environment
 To run tests in a Docker container, ensure the Docker services are running.
 
@@ -207,11 +197,6 @@ To run tests in a Docker container, ensure the Docker services are running.
    docker-compose exec api pytest -v tests/
    ```
    This runs the tests inside the `api` container using the in-memory SQLite database defined in `tests/conftest.py`. The `-v` flag provides verbose output. Note that `app/tests/` is the correct path within the container, as the project is mounted at `/app`.
-
-3. **Run Tests with Coverage** (optional):
-   ```bash
-   docker-compose exec api pytest -v tests/ --cov=app
-   ```
 
 ## API Endpoints
 All endpoints are documented in the interactive Swagger UI at `http://localhost:8000/docs`. Below is a detailed description of each endpoint, including request/response formats, headers, and possible errors.
