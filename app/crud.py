@@ -76,12 +76,18 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
 
 
 def complete_task(db: Session, task_id: int):
-    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    if db_task:
-        db_task.status = schemas.TaskStatus.COMPLETED
-        db.commit()
-        db.refresh(db_task)
-    return db_task
+    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found!")
+    if task.status == models.TaskStatus.COMPLETED:
+        raise HTTPException(
+            status_code=400,
+            detail="Task is already completed!"
+        )
+    task.status = models.TaskStatus.COMPLETED
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 def delete_task(db: Session, task_id: int):

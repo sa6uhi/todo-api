@@ -352,6 +352,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Status: 200 OK
     - Body: Updated task object with `status: "COMPLETED"`
   - **Errors**:
+    - 400 Bad Request: `{ "detail": "Task is already completed!" }` if the task is already in COMPLETED status.
     - 401 Unauthorized: If no valid token is provided.
     - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 403 Forbidden: If user is not the task owner.
