@@ -186,3 +186,77 @@ def test_read_tasks_invalid_limit(client):
     response = client.get("/tasks/?limit=0")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "Limit must be between 1 and 100 (inclusive)!"
+
+
+def test_update_task_empty_update(client, token):
+    """Tests updating a task with no fields provided."""
+    task_data = {"title": "Task to Update", "description": "Update Test"}
+    create_response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert create_response.status_code == status.HTTP_200_OK
+    task_id = create_response.json()["id"]
+    response = client.put(
+        f"/tasks/{task_id}",
+        json={},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["title"] == "Task to Update"
+    assert data["description"] == "Update Test"
+
+
+def test_update_task_invalid_status(client, token):
+    """Tests updating a task with an invalid status."""
+    task_data = {"title": "Task to Update", "description": "Update Test"}
+    create_response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert create_response.status_code == status.HTTP_200_OK
+    task_id = create_response.json()["id"]
+    response = client.put(
+        f"/tasks/{task_id}",
+        json={"title": "Updated Task", "status": "INVALID"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_create_task_max_length(client, token):
+    """Tests creating a task with maximum title and description lengths."""
+    max_title = "x" * 100
+    max_description = "x" * 500
+    task_data = {"title": max_title, "description": max_description}
+    response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["title"] == max_title
+    assert data["description"] == max_description
+
+
+def test_create_task_exceed_max_length(client, token):
+    """Tests creating a task with title and description exceeding maximum lengths."""
+    max_title = "x" * 101
+    max_description = "x" * 501
+    task_data = {"title": max_title, "description": max_description}
+    response = client.post(
+        "/tasks/",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_read_tasks_invalid_status(client):
+    """Tests retrieving tasks with an invalid status filter."""
+    response = client.get("/tasks/?status=INVALID")
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

@@ -95,3 +95,15 @@ def test_delete_user(client, token, test_user):
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_delete_user_nonexistent(client, token, test_user, session):
+    """Tests deleting a user after manual deletion from database."""
+    session.query(models.User).filter(models.User.id == test_user["id"]).delete()
+    session.commit()
+    response = client.delete(
+        "/users/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == "User not found!"
