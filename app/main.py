@@ -65,12 +65,17 @@ def read_tasks(
             status_code=400,
             detail="Skip must be non-negative!"
         )
-    if limit <= 0:
+    if limit <= 0 or limit >= 100:
         raise HTTPException(
             status_code=400,
-            detail="Limit must be greater than zero!"
+            detail="Limit must be between 1 and 100 (inclusive)!"
         )
     tasks, total = crud.get_tasks(db, skip=skip, limit=limit, status=status)
+    if skip > 0 and skip >= total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Skip value {skip} exceeds total tasks {total}"
+        )
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
 
