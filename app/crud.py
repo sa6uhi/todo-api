@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List, Tuple
 from . import models, schemas
 from passlib.context import CryptContext
-from .database import pwd_context
+from .auth import pwd_context
 
 
 def get_user_by_username(db: Session, username: str):
