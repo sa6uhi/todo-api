@@ -73,3 +73,29 @@ def test_login_invalid_credentials(client, test_user):
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json()["detail"] == "Incorrect username or password!"
+
+
+def test_delete_user(client, token, test_user):
+    """Test deleting a user with valid and invalid permissions."""
+    response = client.delete(
+        f"/users/{test_user['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    response = client.post(
+        "/token",
+        data={"username": test_user["username"], "password": "sabuhi123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_delete_user_unauthorized(client, token, test_user):
+    """Test deleting a user without proper authorization."""
+    response = client.delete(
+        f"/users/{test_user['id'] + 1}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()["detail"] == "Not authorized to delete this user!"
