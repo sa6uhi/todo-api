@@ -28,6 +28,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Creates a JWT access token for a user.
+
+    Returns:
+        str: The encoded JWT token.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -39,6 +44,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 def authenticate_user(db: Session, username: str, password: str):
+    """Authenticates a user by verifying username and password.
+
+    Returns:
+        User or False: The user object if authenticated, False otherwise.
+    """
     user = crud.get_user_by_username(db, username)
     if not user:
         return False
@@ -48,10 +58,20 @@ def authenticate_user(db: Session, username: str, password: str):
 
 
 def verify_password(plain_password, hashed_password):
+    """Verifies a plain password against a hashed password.
+
+    Returns:
+        bool: True if passwords match, False otherwise.
+    """
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Retrieves the current user from a JWT token.
+
+    Returns:
+        schemas.User: The authenticated user object.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Couldn't validate credentials!",
