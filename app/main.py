@@ -5,8 +5,12 @@ from datetime import timedelta
 from typing import Optional
 from . import schemas, crud, auth
 from .deps import get_db
+from .database import engine, Base
+from app.models import User, Task
 
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
