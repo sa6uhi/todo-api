@@ -6,10 +6,20 @@ from .auth import pwd_context
 
 
 def get_user_by_username(db: Session, username: str):
+    """Retrieves a user by their username.
+
+    Returns:
+        User or None: The user object if found, None otherwise.
+    """
     return db.query(models.User).filter(models.User.username == username).first()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
+    """Creates a new user with hashed password.
+
+    Returns:
+        User: The created user object.
+    """
     try:
         hashed_password = pwd_context.hash(user.password)
         db_user = models.User(
@@ -31,10 +41,20 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def get_task(db: Session, task_id: int):
+    """Retrieves a task by its ID.
+
+    Returns:
+        Task or None: The task object if found, None otherwise.
+    """
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
 
 def get_tasks(db: Session, skip: int = 0, limit: int = 10, status: Optional[schemas.TaskStatus] = None) -> Tuple[List[models.Task], int]:
+    """Retrieves a list of tasks with pagination and optional status filter.
+
+    Returns:
+        tuple: List of tasks and total count.
+    """
     query = db.query(models.Task)
     if status:
         query = query.filter(models.Task.status == status)
@@ -44,6 +64,11 @@ def get_tasks(db: Session, skip: int = 0, limit: int = 10, status: Optional[sche
 
 
 def get_user_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 10) -> Tuple[List[models.Task], int]:
+    """Retrieves a list of tasks for a specific user with pagination.
+
+    Returns:
+        tuple: List of user tasks and total count.
+    """
     query = db.query(models.Task).filter(models.Task.user_id == user_id)
     total = query.count()
     tasks = query.offset(skip).limit(limit).all()
@@ -51,6 +76,11 @@ def get_user_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 10) ->
 
 
 def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
+    """Creates a new task for a user.
+
+    Returns:
+        Task: The created task object.
+    """
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -65,6 +95,11 @@ def create_task(db: Session, task: schemas.TaskCreate, user_id: int):
 
 
 def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
+    """Updates an existing task.
+
+    Returns:
+        Task: The updated task object.
+    """
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if db_task:
         update_data = task.model_dump(exclude_unset=True)
@@ -76,6 +111,11 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
 
 
 def complete_task(db: Session, task_id: int):
+    """Marks a task as completed.
+
+    Returns:
+        Task: The updated task object.
+    """
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found!")
@@ -91,6 +131,11 @@ def complete_task(db: Session, task_id: int):
 
 
 def delete_task(db: Session, task_id: int):
+    """Deletes a task by its ID.
+
+    Returns:
+        None
+    """
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if db_task:
         db.delete(db_task)
