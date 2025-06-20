@@ -16,11 +16,21 @@ Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():
+    """Returns a welcome message for the API.
+
+    Returns:
+        dict: A welcome message.
+    """
     return {"message": "Welcome to ToDo API"}
 
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Creates a new user.
+
+    Returns:
+        User: The created user object.
+    """
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(
@@ -44,6 +54,11 @@ def delete_user(
 
 @app.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Authenticates a user and returns a JWT token.
+
+    Returns:
+        dict: JWT access token and token type.
+    """
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -64,6 +79,11 @@ def create_task(
     db: Session = Depends(get_db),
     current_user: schemas.User = Depends(auth.get_current_user),
 ):
+    """Creates a new task for the authenticated user.
+
+    Returns:
+        Task: The created task object.
+    """
     return crud.create_task(db=db, task=task, user_id=current_user.id)
 
 
@@ -74,6 +94,11 @@ def read_tasks(
     status: Optional[schemas.TaskStatus] = None,
     db: Session = Depends(get_db),
 ):
+    """Retrieves a paginated list of tasks with optional status filter.
+
+    Returns:
+        dict: Paginated tasks and metadata.
+    """
     if skip < 0:
         raise HTTPException(
             status_code=400,
@@ -100,6 +125,11 @@ def read_user_tasks(
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Retrieves a paginated list of tasks for the authenticated user.
+
+    Returns:
+        dict: Paginated user tasks and metadata.
+    """
     if skip < 0:
         raise HTTPException(
             status_code=400,
@@ -122,6 +152,11 @@ def read_user_tasks(
 
 @app.get("/tasks/{task_id}", response_model=schemas.Task)
 def read_task(task_id: int, db: Session = Depends(get_db)):
+    """Retrieves a task by its ID.
+
+    Returns:
+        Task: The task object.
+    """
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found!")
@@ -135,6 +170,11 @@ def update_task(
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Updates a task for the authenticated user.
+
+    Returns:
+        Task: The updated task object.
+    """
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found!")
@@ -150,6 +190,11 @@ def complete_task(
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Marks a task as completed for the authenticated user.
+
+    Returns:
+        Task: The updated task object.
+    """
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found!")
@@ -165,6 +210,11 @@ def delete_task(
     current_user: schemas.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Deletes a task for the authenticated user.
+
+    Returns:
+        None
+    """
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found!")
