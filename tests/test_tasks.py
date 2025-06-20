@@ -172,4 +172,4 @@ def test_read_tasks_invalid_skip(client):
 def test_read_tasks_invalid_limit(client):
     response = client.get("/tasks/?limit=0")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json()["detail"] == "Limit must be greater than zero!"
+    assert response.json()["detail"] == "Limit must be between 1 and 100 (inclusive)!"
