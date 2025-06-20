@@ -129,20 +129,20 @@ To run the application using Docker, follow these steps for a seamless deploymen
      cp .env.example .env
      ```
    - Edit `.env` to set your environment variables (see [Environment Variables](#environment-variables) for detailed instructions).
-   - Ensure `POSTGRES_HOST` is set to `db` (the service name in `docker-compose.yml`) for Docker.
+   - For Docker, ensure `POSTGRES_HOST` is set to `db` (the service name in `docker-compose.yml`) to allow the API to connect to the PostgreSQL container.
 
 3. **Build and Run with Docker Compose**:
    - Build the Docker images and start the services:
      ```bash
      docker-compose up --build
      ```
-   - This command builds the FastAPI application image and starts both the API and PostgreSQL containers. The `wait-for-it.sh` script ensures the API waits for the database to be ready before starting.
+   - This command builds the FastAPI application image and starts both the API(`api`) and PostgreSQL(`db`) containers. The `wait-for-it.sh` script ensures the API waits for the database to be ready before starting.
    - The API will be available at `http://localhost:8000`. The PostgreSQL database runs in a separate container (`db`) and persists data in a Docker volume (`postgres_data`).
 
 4. **Access the Application**:
    - Open `http://localhost:8000/docs` for interactive API documentation (powered by FastAPI's Swagger UI).
    - Use `http://localhost:8000/redoc` for alternative API documentation.
-   - To verify the database is running, you can connect to it using a PostgreSQL client (e.g., `psql` or pgAdmin) with the credentials from `.env`.
+   - To connect to the database manually, use a PostgreSQL client (e.g., `psql` or pgAdmin) with the credentials from `.env` (host: `localhost`, port: `5432` when running locally, or connect to the `db` container).
 
 5. **Monitor Containers**:
    - Check running containers:
@@ -166,12 +166,12 @@ To run the application using Docker, follow these steps for a seamless deploymen
      ```
 
 7. **Troubleshooting**:
-   - If the API fails to start, ensure the `.env` file is correctly configured and the `SECRET_KEY` is a secure, unique value.
+   - If the API fails to start, ensure the `.env` file is correctly configured, especially `SECRET_KEY` and `POSTGRES_HOST=db`.
    - Check PostgreSQL health with:
      ```bash
      docker-compose exec db pg_isready -U todo_user -d todo_db
      ```
-   - If ports are in use, modify `docker-compose.yml` to use different ports (e.g., `8001:8000`).
+   - If port `8000` is in use, modify `docker-compose.yml` to map a different host port (e.g., `8001:8000`).
 
 ## Running Tests
 
