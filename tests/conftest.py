@@ -22,6 +22,11 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture
 def session():
+    """Sets up an in-memory SQLite database session for testing.
+
+    Yields:
+        Session: A SQLAlchemy database session.
+    """
     models.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
@@ -33,6 +38,11 @@ def session():
 
 @pytest.fixture
 def client(session):
+    """Creates a FastAPI test client with overridden database dependency.
+
+    Yields:
+        TestClient: A FastAPI test client.
+    """
     def override_get_db():
         try:
             yield session
@@ -46,6 +56,11 @@ def client(session):
 
 @pytest_asyncio.fixture
 async def test_user(session):
+    """Creates a test user in the database.
+
+    Returns:
+        dict: The test user data.
+    """
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash("sabuhi123")
     user_data = {
@@ -64,6 +79,11 @@ async def test_user(session):
 
 @pytest_asyncio.fixture
 async def token(client, test_user):
+    """Obtains a JWT token for the test user.
+
+    Returns:
+        str: The JWT access token.
+    """
     response = client.post(
         "/token",
         data={"username": test_user["username"], "password": "sabuhi123"},

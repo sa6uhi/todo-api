@@ -3,6 +3,7 @@ from fastapi import status
 
 
 def test_create_user(client):
+    """Tests creating a user with valid data."""
     user_data = {
         "first_name": "Sabuhi",
         "last_name": "Nazarov",
@@ -19,6 +20,7 @@ def test_create_user(client):
 
 
 def test_create_user_empty_username(client):
+    """Tests creating a user with an empty username."""
     user_data = {
         "first_name": "Sabuhi",
         "last_name": "Nazarov",
@@ -31,6 +33,7 @@ def test_create_user_empty_username(client):
 
 
 def test_create_user_short_password(client):
+    """Tests creating a user with a short password."""
     user_data = {
         "first_name": "Sabuhi",
         "last_name": "Nazarov",
@@ -43,6 +46,7 @@ def test_create_user_short_password(client):
 
 
 def test_create_user_duplicate_username(client, test_user):
+    """Tests creating a user with a duplicate username."""
     user_data = {
         "first_name": "Sabuhi",
         "last_name": "Nazarov",
@@ -55,6 +59,7 @@ def test_create_user_duplicate_username(client, test_user):
 
 
 def test_login_success(client, test_user):
+    """Tests successful user login."""
     response = client.post(
         "/token",
         data={"username": test_user["username"], "password": "sabuhi123"},
@@ -66,6 +71,7 @@ def test_login_success(client, test_user):
     assert data["token_type"] == "bearer"
 
 def test_login_invalid_credentials(client, test_user):
+    """Tests login with invalid credentials."""
     response = client.post(
         "/token",
         data={"username": test_user["username"], "password": "wrongpassword"},
@@ -76,7 +82,7 @@ def test_login_invalid_credentials(client, test_user):
 
 
 def test_delete_user(client, token, test_user):
-    """Test deleting the authenticated user."""
+    """Tests deleting the authenticated user."""
     response = client.delete(
         "/users/me",
         headers={"Authorization": f"Bearer {token}"},

@@ -3,6 +3,7 @@ from fastapi import status
 
 
 def test_create_task(client, token):
+    """Tests creating a task with valid data."""
     task_data = {"title": "Test Task",
                  "description": "Test Description"}
     response = client.post(
@@ -19,6 +20,7 @@ def test_create_task(client, token):
 
 
 def test_create_task_invalid_title(client, token):
+    """Tests creating a task with an invalid title."""
     task_data = {"title": "", "description": "Invalid"}
     response = client.post(
         "/tasks/",
@@ -30,6 +32,7 @@ def test_create_task_invalid_title(client, token):
 
 
 def test_create_task_without_token(client):
+    """Tests creating a task without authentication."""
     task_data = {"title": "Test Task Without Token",
                  "description": "Test Description"}
     response = client.post("/tasks/", json=task_data)
@@ -39,6 +42,7 @@ def test_create_task_without_token(client):
 
 
 def test_create_task_with_invalid_token(client):
+    """Tests creating a task with an invalid token."""
     task_data = {"title": "Test Task With Invalid Token",
                  "description": "Test Description"}
     response = client.post(
@@ -52,6 +56,7 @@ def test_create_task_with_invalid_token(client):
 
 
 def test_read_tasks(client):
+    """Tests retrieving a paginated list of tasks."""
     response = client.get("/tasks/")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -62,6 +67,7 @@ def test_read_tasks(client):
 
 
 def test_read_user_tasks(client, token):
+    """Tests retrieving a paginated list of user tasks."""
     response = client.get(
         "/tasks/user/", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == status.HTTP_200_OK
@@ -71,6 +77,7 @@ def test_read_user_tasks(client, token):
 
 
 def test_read_task(client, token):
+    """Tests retrieving a task by ID."""
     task_data = {"title": "Task to Read", "description": "Read Test"}
     create_response = client.post(
         "/tasks/",
@@ -86,6 +93,7 @@ def test_read_task(client, token):
 
 
 def test_update_task(client, token):
+    """Tests updating a task with valid data."""
     task_data = {"title": "Task to Update", "description": "Update Test"}
     create_response = client.post(
         "/tasks/",
@@ -107,6 +115,7 @@ def test_update_task(client, token):
 
 
 def test_complete_task(client, token):
+    """Tests marking a task as completed."""
     task_data = {"title": "Task to Complete", "description": "Complete Test"}
     create_response = client.post(
         "/tasks/",
@@ -125,6 +134,7 @@ def test_complete_task(client, token):
 
 
 def test_delete_task(client, token):
+    """Tests deleting a task."""
     task_data = {"title": "Task to Delete", "description": "Delete Test"}
     create_response = client.post(
         "/tasks/",
@@ -143,6 +153,7 @@ def test_delete_task(client, token):
 
 
 def test_read_tasks_with_pagination_and_status(client, token):
+    """Tests retrieving tasks with pagination and status filter."""
     create_response1 = client.post(
         "/tasks/",
         json={"title": "Task 1", "status": "NEW"},
@@ -164,12 +175,14 @@ def test_read_tasks_with_pagination_and_status(client, token):
 
 
 def test_read_tasks_invalid_skip(client):
+    """Tests retrieving tasks with an invalid skip value."""
     response = client.get("/tasks/?skip=-1")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "Skip must be non-negative!"
 
 
 def test_read_tasks_invalid_limit(client):
+    """Tests retrieving tasks with an invalid limit value."""
     response = client.get("/tasks/?limit=0")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "Limit must be between 1 and 100 (inclusive)!"
