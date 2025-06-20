@@ -265,7 +265,9 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - 401 Unauthorized: `{ "detail": "Not authenticated" }` if no token is provided.
     - 401 Unauthorized: `{ "detail": "Couldn't validate credentials!" }` if token is invalid.
     - 422 Unprocessable Entity: If `title` is empty or exceeds 100 characters, or `description` exceeds 500 characters.
-  - **Notes**: The task is automatically associated with the authenticated user. The `status` field must be one of `NEW`, `IN_PROGRESS`, or `COMPLETED` in uppercase. Lowercase or mixed-case values (e.g., `new`, `In_Progress`) will result in a 422 Unprocessable Entity error.
+  - **Notes**: 
+    - The task is automatically associated with the authenticated user. 
+    - The `status` field must be one of `NEW`, `IN_PROGRESS`, or `COMPLETED` in uppercase. Lowercase or mixed-case values (e.g., `new`, `In_Progress`) will result in a 422 Unprocessable Entity error.
 
 - **GET /tasks/**
   - **Description**: Retrieves a paginated list of all tasks, optionally filtered by status.
