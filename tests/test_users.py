@@ -76,9 +76,9 @@ def test_login_invalid_credentials(client, test_user):
 
 
 def test_delete_user(client, token, test_user):
-    """Test deleting a user with valid and invalid permissions."""
+    """Test deleting the authenticated user."""
     response = client.delete(
-        f"/users/{test_user['id']}",
+        "/users/me",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == status.HTTP_200_OK
@@ -89,13 +89,3 @@ def test_delete_user(client, token, test_user):
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-def test_delete_user_unauthorized(client, token, test_user):
-    """Test deleting a user without proper authorization."""
-    response = client.delete(
-        f"/users/{test_user['id'] + 1}",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.json()["detail"] == "Not authorized to delete this user!"
