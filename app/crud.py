@@ -116,7 +116,7 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found!")
-    update_data = task.dict(exclude_unset=True)
+    update_data = task.model_dump(exclude_unset=True)
     if not update_data:
         return db_task
     for key, value in update_data.items():
