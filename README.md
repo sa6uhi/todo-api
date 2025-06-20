@@ -264,6 +264,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
   - **Errors**:
     - 401 Unauthorized: `{ "detail": "Not authenticated" }` if no token is provided.
     - 401 Unauthorized: `{ "detail": "Couldn't validate credentials!" }` if token is invalid.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 422 Unprocessable Entity: If `title` is empty or exceeds 100 characters, or `description` exceeds 500 characters.
   - **Notes**: 
     - The task is automatically associated with the authenticated user. 
@@ -302,6 +303,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: `{ "items": [{ "id": <int>, "title": "<string>", "description": "<string|null>", "status": "<string>", "user_id": <int> }], "total": <int>, "skip": <int>, "limit": <int> }`
   - **Errors**:
     - 401 Unauthorized: If no valid token is provided.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 400 Bad Request: `{ "detail": "Skip must be non-negative!" }` if `skip` < 0.
     - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` ≥ 100.
     - 400 Bad Request: `{ "detail": "Skip value {skip} exceeds total user tasks {total}" }` if `skip` is greater than or equal to the total number of user tasks.
@@ -333,6 +335,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: Updated task object
   - **Errors**:
     - 401 Unauthorized: If no valid token is provided.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 403 Forbidden: `{ "detail": "Not authorized to update this task!" }` if user is not the task owner.
     - 404 Not Found: If task ID does not exist.
     - 422 Unprocessable Entity: If input validation fails.
@@ -350,6 +353,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: Updated task object with `status: "COMPLETED"`
   - **Errors**:
     - 401 Unauthorized: If no valid token is provided.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 403 Forbidden: If user is not the task owner.
     - 404 Not Found: If task ID does not exist.
   - **Notes**: Only changes the `status` field to `COMPLETED`.
@@ -366,6 +370,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: None
   - **Errors**:
     - 401 Unauthorized: If no valid token is provided.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 403 Forbidden: If user is not the task owner.
     - 404 Not Found: If task ID does not exist.
   - **Notes**: Deletes the task permanently from the database.
