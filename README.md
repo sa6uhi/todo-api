@@ -204,13 +204,13 @@ To run tests in a Docker container, ensure the Docker services are running.
 
 2. **Run Tests**:
    ```bash
-   docker-compose exec api pytest -v app/tests/
+   docker-compose exec api pytest -v tests/
    ```
    This runs the tests inside the `api` container using the in-memory SQLite database defined in `tests/conftest.py`. The `-v` flag provides verbose output. Note that `app/tests/` is the correct path within the container, as the project is mounted at `/app`.
 
 3. **Run Tests with Coverage** (optional):
    ```bash
-   docker-compose exec api pytest -v app/tests/ --cov=app
+   docker-compose exec api pytest -v tests/ --cov=app
    ```
 
 ## API Endpoints
