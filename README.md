@@ -462,6 +462,12 @@ The application uses a `.env` file to manage configuration securely. Copy `.env.
        ```
      - Example: `your-secure-secret-key-1234567890abcdef`
      - Keep this secret and unique for each deployment.
+   - `JWT_ALGORITHM`: Algorithm for JWT encoding.
+     - Default: `HS256`
+     - Example: `HS256`
+   - `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration time in minutes.
+     - Default: `30`
+     - Example: `30`
 
 3. **Example `.env`**:
    ```
@@ -471,6 +477,8 @@ The application uses a `.env` file to manage configuration securely. Copy `.env.
    POSTGRES_PORT=5432
    POSTGRES_DB=todo_db
    SECRET_KEY=your-secure-secret-key-1234567890abcdef
+   JWT_ALGORITHM=HS256
+   ACCESS_TOKEN_EXPIRE_MINUTES=30
    ```
 
 4. **Security Notes**:

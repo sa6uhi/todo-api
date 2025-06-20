@@ -13,9 +13,15 @@ import os
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable not set. Please add it to .env or your environment variables.")
+if not all([SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES]):
+    raise ValueError(
+        "One or more required environment variables are not set. "
+        "Please ensure the following are defined in your .env or environment variables: "
+        "SECRET_KEY, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES."
+    )
 
 
 ALGORITHM = "HS256"

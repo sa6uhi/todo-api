@@ -10,6 +10,8 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_DB=todo_db
       - SECRET_KEY=${SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
     depends_on:
       db:
         condition: service_healthy
