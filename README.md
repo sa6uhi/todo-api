@@ -233,6 +233,26 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - 422 Unprocessable Entity: If `first_name` or `username` is empty, or `password` is less than 6 characters.
   - **Notes**: Passwords are hashed using bcrypt before storage ([auth.py](app/auth.py)).
 
+- **DELETE /users/{user_id}**
+  - **Description**: Deletes the authenticated user's account and all associated tasks.
+  - **Request**:
+    - Method: DELETE
+    - Path Parameter: `user_id` (integer)
+    - Headers: `Authorization: Bearer <jwt-token>`
+    - Example: `/users/1`
+  - **Response**:
+    - Status: 200 OK
+    - Body: None
+  - **Errors**:
+    - 401 Unauthorized: `{ "detail": "Not authenticated" }` if no token is provided.
+    - 401 Unauthorized: `{ "detail": "Couldn't validate credentials!" }` if token is invalid.
+    - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
+    - 403 Forbidden: `{ "detail": "Not authorized to delete this user!" }` if the user tries to delete another user’s account.
+    - 404 Not Found: `{ "detail": "User not found!" }` if the user ID does not exist.
+  - **Notes**: 
+    - Only the authenticated user can delete their own account.
+    - Deleting a user automatically deletes all their tasks due to cascading deletion.
+
 ### Task Endpoints
 - **POST /tasks/**
   - **Description**: Creates a new task for the authenticated user.
@@ -421,6 +441,11 @@ Below are example API calls using `curl`. Replace `<token>` with a valid JWT obt
    curl -X DELETE "http://localhost:8000/tasks/1" \
    -H "Authorization: Bearer <token>"
    ```
+
+10. **Delete a User**:
+   ```bash
+   curl -X DELETE "http://localhost:8000/users/1" \
+   -H "Authorization: Bearer <token>"
 
 ## Environment Variables
 The application uses a `.env` file to manage configuration securely. Copy `.env.example` to `.env` and update the values as described below:

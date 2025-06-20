@@ -28,6 +28,21 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
+@app.delete("/users/{user_id}", response_model=None)
+def delete_user(
+    user_id: int,
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to delete this user!"
+        )
+    crud.delete_user(db=db, user_id=user_id)
+    return None
+
+
 @app.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
