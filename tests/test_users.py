@@ -1,5 +1,6 @@
 import pytest
 from fastapi import status
+from app import models
 
 
 def test_create_user(client):
