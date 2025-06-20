@@ -114,12 +114,15 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
         Task: The updated task object.
     """
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    if db_task:
-        update_data = task.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_task, key, value)
-        db.commit()
-        db.refresh(db_task)
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found!")
+    update_data = task.dict(exclude_unset=True)
+    if not update_data:
+        return db_task
+    for key, value in update_data.items():
+        setattr(db_task, key, value)
+    db.commit()
+    db.refresh(db_task)
     return db_task
 
 
