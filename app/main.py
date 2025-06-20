@@ -10,6 +10,7 @@ from app.models import User, Task
 
 app = FastAPI()
 
+# Create database tables on startup
 Base.metadata.create_all(bind=engine)
 
 
