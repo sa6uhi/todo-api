@@ -220,7 +220,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
   - **Notes**: Passwords are hashed using bcrypt before storage ([auth.py](app/auth.py)).
 
 - **DELETE /users/me**
-  - **Description**: Deletes the authenticated user's account and all associated tasks.
+  - **Description**: Deletes the authenticated user's account and all associated tasks(cascading deletion).
   - **Request**:
     - Method: DELETE
     - Headers: `Authorization: Bearer <jwt-token>`
@@ -461,12 +461,15 @@ The application uses a `.env` file to manage configuration securely. Copy `.env.
      - Example: `todo_db`
      - Must match the database created in PostgreSQL.
    - `SECRET_KEY`: Secret key for JWT token signing.
-     - Generate a secure key using:
+     - You can generate a secure key using:
        ```bash
-       openssl rand -hex 32
+       openssl rand -hex 32 # 64-char hex (32 bytes)
+       # or 
+       openssl rand -base64 24 # 32-char Base64 (24 bytes)
        ```
      - Example: `your-secure-secret-key-1234567890abcdef`
      - Keep this secret and unique for each deployment.
+     - Rotate the key if compromised.
    - `JWT_ALGORITHM`: Algorithm for JWT encoding.
      - Default: `HS256`
      - Example: `HS256`
