@@ -3,7 +3,7 @@
 A RESTful API for managing a task list (ToDo list) built with **FastAPI**, **PostgreSQL**, and **JWT authentication**. This project provides a fully functional API with CRUD operations for tasks, user authentication, pagination, and unit tests. The application is Dockerized for easy deployment and includes comprehensive documentation.
 
 ## Table of Contents
-- [Project Overview](#overview)
+- [Overview](#overview)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
   - [Local Setup](#local-setup)
