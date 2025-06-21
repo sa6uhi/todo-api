@@ -274,7 +274,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Example: `{ "items": [{ "id": 1, "title": "Finish project", "description": "Complete API", "status": "NEW", "user_id": 1 }], "total": 1, "skip": 0, "limit": 10 }`
   - **Errors**:
     - 400 Bad Request: `{ "detail": "Skip must be non-negative!" }` if `skip` < 0.
-    - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` ≥ 100.
+    - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` > 100.
     - 400 Bad Request: `{ "detail": "Skip value {skip} exceeds total tasks {total}" }` if `skip` is greater than or equal to the total number of tasks.
   - **Notes**: No authentication is required for this endpoint.
 
@@ -294,7 +294,7 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - 401 Unauthorized: If no valid token is provided.
     - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
     - 400 Bad Request: `{ "detail": "Skip must be non-negative!" }` if `skip` < 0.
-    - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` ≥ 100.
+    - 400 Bad Request: `{ "detail": "Limit must be between 1 and 100 (inclusive)!" }` if `limit` ≤ 0 or `limit` > 100.
     - 400 Bad Request: `{ "detail": "Skip value {skip} exceeds total user tasks {total}" }` if `skip` is greater than or equal to the total number of user tasks.
   - **Notes**: Only returns tasks owned by the authenticated user.
 
