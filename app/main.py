@@ -33,8 +33,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
-        raise HTTPException(
-            status_code=400, detail="Username already registered!")
+        raise HTTPException(status_code=400, detail="Username already registered!")
     return crud.create_user(db=db, user=user)
 
 
@@ -53,7 +52,9 @@ def delete_user(
 
 
 @app.post("/token", response_model=schemas.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
     """Authenticates a user and returns a JWT token.
 
     Returns:
@@ -100,20 +101,15 @@ def read_tasks(
         dict: Paginated tasks and metadata.
     """
     if skip < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Skip must be non-negative!"
-        )
+        raise HTTPException(status_code=400, detail="Skip must be non-negative!")
     if limit <= 0 or limit >= 100:
         raise HTTPException(
-            status_code=400,
-            detail="Limit must be between 1 and 100 (inclusive)!"
+            status_code=400, detail="Limit must be between 1 and 100 (inclusive)!"
         )
     tasks, total = crud.get_tasks(db, skip=skip, limit=limit, status=status)
     if skip > 0 and skip >= total:
         raise HTTPException(
-            status_code=400,
-            detail=f"Skip value {skip} exceeds total tasks {total}"
+            status_code=400, detail=f"Skip value {skip} exceeds total tasks {total}"
         )
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
@@ -131,21 +127,18 @@ def read_user_tasks(
         dict: Paginated user tasks and metadata.
     """
     if skip < 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Skip must be non-negative!"
-        )
+        raise HTTPException(status_code=400, detail="Skip must be non-negative!")
     if limit <= 0 or limit >= 100:
         raise HTTPException(
-            status_code=400,
-            detail="Limit must be between 1 and 100 (inclusive)!"
+            status_code=400, detail="Limit must be between 1 and 100 (inclusive)!"
         )
     tasks, total = crud.get_user_tasks(
-        db, user_id=current_user.id, skip=skip, limit=limit)
+        db, user_id=current_user.id, skip=skip, limit=limit
+    )
     if skip > 0 and skip >= total:
         raise HTTPException(
             status_code=400,
-            detail=f"Skip value {skip} exceeds total user tasks {total}"
+            detail=f"Skip value {skip} exceeds total user tasks {total}",
         )
     return {"items": tasks, "total": total, "skip": skip, "limit": limit}
 
@@ -176,11 +169,22 @@ def update_task(
         Task: The updated task object.
     """
     db_task = crud.get_task(db, task_id=task_id)
-    if db_task is None:
+    if not db_task:
         raise HTTPException(status_code=404, detail="Task not found!")
     if db_task.user_id != current_user.id:
         raise HTTPException(
-            status_code=403, detail="Not authorized to update this task!")
+            status_code=403, detail="Not authorized to update this task!"
+        )
+    if task.dict(exclude_unset=True) == {}:
+        return db_task
+    if task.title and (len(task.title.strip()) == 0 or len(task.title) > 100):
+        raise HTTPException(
+            status_code=422, detail="Title must be between 1 and 100 characters!"
+        )
+    if task.description and len(task.description) > 500:
+        raise HTTPException(
+            status_code=422, detail="Description cannot exceed 500 characters!"
+        )
     return crud.update_task(db=db, task_id=task_id, task=task)
 
 
@@ -200,7 +204,8 @@ def complete_task(
         raise HTTPException(status_code=404, detail="Task not found!")
     if db_task.user_id != current_user.id:
         raise HTTPException(
-            status_code=403, detail="Not authorized to update this task!")
+            status_code=403, detail="Not authorized to update this task!"
+        )
     return crud.complete_task(db=db, task_id=task_id)
 
 
@@ -220,6 +225,7 @@ def delete_task(
         raise HTTPException(status_code=404, detail="Task not found!")
     if db_task.user_id != current_user.id:
         raise HTTPException(
-            status_code=403, detail="Not authorized to delete this task!")
+            status_code=403, detail="Not authorized to delete this task!"
+        )
     crud.delete_task(db=db, task_id=task_id)
     return None

@@ -342,7 +342,11 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - 403 Forbidden: `{ "detail": "Not authorized to update this task!" }` if user is not the task owner.
     - 404 Not Found: If task ID does not exist.
     - 422 Unprocessable Entity: If input validation fails.
-  - **Notes**: Partial updates are supported (unchanged fields retain their values).
+  - **Notes**: 
+    - Partial updates are supported (unchanged fields retain their values).
+    - The `status` field must be one of `NEW`, `IN_PROGRESS`, or `COMPLETED` in uppercase. Lowercase or mixed-case values (e.g., `new`, `In_Progress`) will result in a 422 Unprocessable Entity error.
+    - An empty payload (`{}`) is valid and returns the unchanged task.
+    - Title must be between 1 and 100 characters; description cannot exceed 500 characters.
 
 - **PATCH /tasks/{task_id}/complete**
   - **Description**: Marks a task as COMPLETED (only by the task owner).
