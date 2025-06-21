@@ -175,7 +175,7 @@ def update_task(
         raise HTTPException(
             status_code=403, detail="Not authorized to update this task!"
         )
-    if task.dict(exclude_unset=True) == {}:
+    if task.model_dump(exclude_unset=True) == {}:
         return db_task
     if task.title and (len(task.title.strip()) == 0 or len(task.title) > 100):
         raise HTTPException(
