@@ -121,7 +121,7 @@ def read_tasks(
     """
     if skip < 0:
         raise HTTPException(status_code=400, detail="Skip must be non-negative!")
-    if limit <= 0 or limit >= 100:
+    if limit <= 0 or limit > 100:
         raise HTTPException(
             status_code=400, detail="Limit must be between 1 and 100 (inclusive)!"
         )
@@ -147,7 +147,7 @@ def read_user_tasks(
     """
     if skip < 0:
         raise HTTPException(status_code=400, detail="Skip must be non-negative!")
-    if limit <= 0 or limit >= 100:
+    if limit <= 0 or limit > 100:
         raise HTTPException(
             status_code=400, detail="Limit must be between 1 and 100 (inclusive)!"
         )
