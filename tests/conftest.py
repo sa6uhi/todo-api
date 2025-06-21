@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.deps import get_db
+from app.database import Base
 from app import models, schemas
 from passlib.context import CryptContext
 
@@ -18,6 +19,8 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
+
+Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture
