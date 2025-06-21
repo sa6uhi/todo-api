@@ -20,15 +20,15 @@ class User(Base):
     password = Column(String, nullable=False)
 
     tasks = relationship("Task", back_populates="owner",
-                         passive_deletes=True)
+                         cascade="all, delete-orphan")
 
 
 class Task(Base):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=True)
+    title = Column(String(100), nullable=False)
+    description = Column(String(500), nullable=True)
     status = Column(Enum(TaskStatus), default=TaskStatus.NEW, nullable=False)
     user_id = Column(Integer, ForeignKey(
         "users.id", ondelete="CASCADE"), nullable=False)
