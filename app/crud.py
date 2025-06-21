@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional, List, Tuple
 from . import models, schemas

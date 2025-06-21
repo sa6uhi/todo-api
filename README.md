@@ -244,9 +244,9 @@ All endpoints are documented in the interactive Swagger UI at `http://localhost:
     - Body: None
   - **Errors**:
     - 401 Unauthorized: `{ "detail": "Not authenticated" }` if no token is provided.
-    - 401 Unauthorized: `{ "detail": "Couldn't validate credentials!" }` if token is invalid.
+    - 401 Unauthorized: `{ "detail": "Couldn't validate credentials!" }` if token is invalid or missing user ID.
     - 401 Unauthorized: `{ "detail": "Token has expired!" }` if the JWT token is expired.
-    - 404 Not Found: `{ "detail": "User not found!" }` if the user does not exist.
+    - 404 Not Found: `{ "detail": "User not found!" }` if the user does not exist in the database.
   - **Notes**: 
     - Deletes the authenticated user’s account automatically using their ID from the JWT token.
     - All associated tasks are deleted due to cascading deletion.

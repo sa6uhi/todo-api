@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt, JWTError, ExpiredSignatureError
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import Optional
@@ -39,7 +40,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.delete("/users/me", response_model=None)
 def delete_user(
-    current_user: schemas.User = Depends(auth.get_current_user),
+    token: str = Depends(auth.oauth2_scheme),
     db: Session = Depends(get_db),
 ):
     """Deletes the authenticated user's account.
@@ -47,7 +48,25 @@ def delete_user(
     Returns:
         None
     """
-    crud.delete_user(db=db, user_id=current_user.id)
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Couldn't validate credentials!",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
+        user_id: int = payload.get("user_id")
+        if user_id is None:
+            raise credentials_exception
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired!",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except JWTError:
+        raise credentials_exception
+    crud.delete_user(db=db, user_id=user_id)
     return None
 
 
