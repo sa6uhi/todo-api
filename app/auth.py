@@ -38,7 +38,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "user_id": data.get("user_id", data.get("sub"))})
+    to_encode.update({"exp": expire})
+    if "user_id" in to_encode:
+        to_encode["user_id"] = int(to_encode["user_id"])
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 

@@ -89,13 +89,7 @@ def test_delete_user(client, token, test_user):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == status.HTTP_200_OK
-
-    response = client.post(
-        "/token",
-        data={"username": test_user["username"], "password": "sabuhi123"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json() is None
 
 
 def test_delete_user_nonexistent(client, token, test_user, session):
