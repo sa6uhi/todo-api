@@ -101,7 +101,7 @@ To run the application locally, follow these steps:
    The API will be available at `http://localhost:8000`. Access the interactive API docs at `http://localhost:8000/docs`.
 
 ### Docker Setup
-To run the application using Docker, follow these steps for a seamless deployment:
+To run the application using Docker, follow these steps for a seamless deployment(**before starting, ensure Docker is running on your system**):
 
 1. **Clone the Repository**:
    ```bash
@@ -130,7 +130,18 @@ To run the application using Docker, follow these steps for a seamless deploymen
    - Use `http://localhost:8000/redoc` for alternative API documentation.
    - To connect to the database manually, use a PostgreSQL client (e.g., `psql` or pgAdmin) with the credentials from `.env` (host: `localhost`, port: `5432` when running locally, or connect to the `db` container).
 
-5. **Monitor Containers**:
+5. **Access API and DB Terminals**
+    - **API container shell**:
+      ```bash
+      docker-compose exec api sh
+      ```
+    - **PostgreSQL shell**:
+      ```bash
+      docker-compose exec db psql -U todo_user -d todo_db
+      ```
+      Replace with your actual .env values if customized.
+
+6. **Monitor Containers**:
    - Check running containers:
      ```bash
      docker-compose ps
@@ -140,8 +151,8 @@ To run the application using Docker, follow these steps for a seamless deploymen
      docker-compose logs api
      docker-compose logs db
      ```
-
-6. **Stop and Clean Up**:
+     
+7. **Stop and Clean Up**:
    - Stop the containers:
      ```bash
      docker-compose down
@@ -151,7 +162,7 @@ To run the application using Docker, follow these steps for a seamless deploymen
      docker-compose down -v
      ```
 
-7. **Troubleshooting**:
+8. **Troubleshooting**:
    - If the API fails to start, ensure the `.env` file is correctly configured, especially `SECRET_KEY` and `POSTGRES_HOST=db`.
    - Check PostgreSQL health with:
      ```bash
