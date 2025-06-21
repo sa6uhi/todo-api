@@ -3,8 +3,7 @@
 A RESTful API for managing a task list (ToDo list) built with **FastAPI**, **PostgreSQL**, and **JWT authentication**. This project provides a fully functional API with CRUD operations for tasks, user authentication, pagination, and unit tests. The application is Dockerized for easy deployment and includes comprehensive documentation.
 
 ## Table of Contents
-- [Project Overview](#project-overview)
-- [Features](#features)
+- [Project Overview](#overview)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
   - [Local Setup](#local-setup)
@@ -21,33 +20,20 @@ A RESTful API for managing a task list (ToDo list) built with **FastAPI**, **Pos
 - [Contributing](#contributing)
 - [License](#license)
 
-## Project Overview
-This project is a RESTful API for managing a ToDo list, developed using **FastAPI** for high performance and **PostgreSQL** for persistent storage. It includes user authentication via JWT, task CRUD operations, status filtering, and pagination. The API ensures that only authorized users can create, update, or delete their own tasks. Unit tests are provided to validate functionality, and the application is Dockerized for seamless deployment.
+## Overview
+This RESTful API, developed with **FastAPI** and **PostgreSQL**, enables users to manage a ToDo list with secure **JWT authentication**. Key features include:
 
-The project includes:
-- User and Task models with required fields.
-- CRUD operations for tasks with ownership restrictions.
-- JWT-based authentication and authorization.
-- Pagination for task lists.
-- Filtering tasks by status.
-- Unit tests for API endpoints.
-- PostgreSQL database configuration.
-- GitHub repository (https://github.com/sa6uhi/todo-api).
-- Dockerized setup for easy deployment.
-
-## Features
-- **User Management**: Register users with first name, last name (optional), username, and password (min 6 characters).
-- **Task Management**: Create, read, update, and delete tasks with title, description (optional), status, and user ownership.
-- **Authentication**: Secure JWT-based authentication for all protected endpoints.
-- **Authorization**: Only task owners can update or delete their tasks.
-- **Pagination**: Retrieve tasks with `skip` and `limit` parameters for paginated responses.
-- **Status Filtering**: Filter tasks by status (NEW, IN_PROGRESS, COMPLETED).
-- **Testing**: Comprehensive unit tests for user and task endpoints using pytest.
-- **Docker Support**: Dockerized application with PostgreSQL for easy deployment.
-- **Environment Configuration**: Managed via `.env` file for secure settings.
+- **User Management**: Register users with first name, last name (optional), unique username, and password (min 6 characters).
+- **Task Management**: Create, read, update, and delete tasks with title, description (optional), status (NEW, IN_PROGRESS, COMPLETED), and user ownership.
+- **Authentication & Authorization**: JWT-based authentication for protected endpoints; only task owners can modify their tasks.
+- **Pagination & Filtering**: Paginated task retrieval with skip and limit parameters, plus optional status filtering.
+- **Testing**: Comprehensive unit tests (~30 tests) for user and task endpoints using pytest, covering edge cases and validation.
+- **Docker Support**: Dockerized setup with PostgreSQL.
+- **Environment Configuration**: Managed via .env file for secure settings.
+- **GitHub repository**: (https://github.com/sa6uhi/todo-api).
 
 ## Project Structure
-Below is the project structure with descriptions of key files and directories. Each file is hyperlinked to its location in the repository (https://github.com/sa6uhi/todo-api).
+Below is the project structure with descriptions of key files and directories, hyperlinked to its repository locations.
 
 - **[app/](app/)**: Core application directory containing the FastAPI application code.
   - **[__init__.py](app/__init__.py)**: Initializes the app module.
@@ -55,19 +41,19 @@ Below is the project structure with descriptions of key files and directories. E
   - **[crud.py](app/crud.py)**: Contains CRUD operations for users and tasks using SQLAlchemy.
   - **[database.py](app/database.py)**: Configures the PostgreSQL database connection and SQLAlchemy setup.
   - **[deps.py](app/deps.py)**: Defines dependency injection for database sessions.
-  - **[main.py](app/main.py)**: Main FastAPI application with endpoint definitions and database initialization.
+  - **[main.py](app/main.py)**: Main FastAPI application with endpoint definitions.
   - **[models.py](app/models.py)**: Defines SQLAlchemy models for User and Task with relationships.
   - **[schemas.py](app/schemas.py)**: Pydantic schemas for data validation and serialization.
 - **[tests/](tests/)**: Directory for unit tests.
   - **[conftest.py](tests/conftest.py)**: Pytest fixtures for setting up test database and client.
   - **[test_tasks.py](tests/test_tasks.py)**: Unit tests for task-related endpoints.
   - **[test_users.py](tests/test_users.py)**: Unit tests for user-related endpoints.
-- **[.dockerignore](.dockerignore)**: Specifies files to exclude from Docker image builds.
+- **[.dockerignore](.dockerignore)**: Excludes files from Docker builds.
 - **[.env.example](.env.example)**: Template for environment variables configuration.
 - **[.gitignore](.gitignore)**: Specifies files and directories to exclude from Git version control.
 - **[docker-compose.yml](docker-compose.yml)**: Configures Docker services for the API and PostgreSQL database.
 - **[Dockerfile](Dockerfile)**: Defines the Docker image for the FastAPI application.
-- **[pytest.ini](pytest.ini)**: Configures pytest settings, including warning filters.
+- **[pytest.ini](pytest.ini)**: Configures pytest settings.
 - **[requirements.txt](requirements.txt)**: Lists Python dependencies for the project.
 
 ## Installation
@@ -182,7 +168,7 @@ To run unit tests locally, ensure the virtual environment is activated and depen
    ```bash
    pytest tests/ -v
    ```
-   This executes all tests in the `tests/` directory using an in-memory SQLite database for isolation. The `-v` flag provides verbose output for better test result visibility.
+   Executes ~30 tests in `tests/` using an in-memory SQLite database for isolation, covering user/task endpoints, validation, and edge cases. The `-v` flag provides verbose output.
 
 ### Docker Environment
 To run tests in a Docker container, ensure the Docker services are running.
@@ -196,7 +182,7 @@ To run tests in a Docker container, ensure the Docker services are running.
    ```bash
    docker-compose exec api pytest -v tests/
    ```
-   This runs the tests inside the `api` container using the in-memory SQLite database defined in `tests/conftest.py`. The `-v` flag provides verbose output. Note that `app/tests/` is the correct path within the container, as the project is mounted at `/app`.
+   This runs the tests inside the `api` container using the in-memory SQLite database defined in `tests/conftest.py`. The `-v` flag provides verbose output. Note that `tests/` is the correct path within the container, as the project is mounted at `/app`.
 
 ## API Endpoints
 All endpoints are documented in the interactive Swagger UI at `http://localhost:8000/docs`. Below is a detailed description of each endpoint, including request/response formats, headers, and possible errors.
