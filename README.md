@@ -434,6 +434,7 @@ Below are example API calls using `curl`. Replace `<token>` with a valid JWT obt
    ```bash
    curl -X DELETE "http://localhost:8000/users/me" \
    -H "Authorization: Bearer <token>"
+   ```
 
 ## Environment Variables
 The application uses a `.env` file to manage configuration securely. Copy `.env.example` to `.env` and update the values as described below:
