@@ -102,3 +102,55 @@ def test_delete_user_nonexistent(client, token, test_user, session):
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()["detail"] == "User not found!"
+
+
+def test_delete_user_with_tasks(client, token, test_user, session):
+    """Tests deleting a user with associated tasks."""
+
+    for i in range(2):
+        client.post(
+            "/tasks/",
+            json={"title": f"Task {i}"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    tasks = session.query(models.Task).filter(models.Task.user_id == test_user["id"]).count()
+    assert tasks == 2
+    response = client.delete(
+        "/users/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() is None
+    tasks = session.query(models.Task).filter(models.Task.user_id == test_user["id"]).count()
+    assert tasks == 0
+
+def test_login_empty_credentials(client):
+    """Tests login with empty username or password."""
+
+    response = client.post(
+        "/token",
+        data={"username": "", "password": "sabuhi123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()["detail"] == "Incorrect username or password!"
+
+    response = client.post(
+        "/token",
+        data={"username": "testuser", "password": ""},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()["detail"] == "Incorrect username or password!"
+
+
+def test_login_nonexistent_user(client):
+    """Tests login with a non-existent username."""
+    response = client.post(
+        "/token",
+        data={"username": "nonexistent", "password": "sabuhi123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()["detail"] == "Incorrect username or password!"
