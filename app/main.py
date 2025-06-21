@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError, ExpiredSignatureError
+from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import Optional
@@ -9,11 +10,14 @@ from .deps import get_db
 from .database import engine, Base
 from app.models import User, Task
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Handle startup and shutdown events."""
+    # at startup create database tables
+    Base.metadata.create_all(bind=engine)
+    yield
+
 app = FastAPI()
-
-# Create database tables on startup
-Base.metadata.create_all(bind=engine)
-
 
 @app.get("/")
 def read_root():
