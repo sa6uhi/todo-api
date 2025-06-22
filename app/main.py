@@ -8,7 +8,7 @@ from typing import Optional
 from . import schemas, crud, auth
 from .deps import get_db
 from .database import engine, Base
-from app.models import User, Task
+from .models import User, Task
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def read_root():
